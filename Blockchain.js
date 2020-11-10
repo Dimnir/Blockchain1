@@ -1,4 +1,11 @@
-const SHA256 = require('crypto-js/sha256') // sha256 = 2**256
+/***************************************
+installs:
+---------
+ crypto:    npm install crypto-js
+ elliptic:  npm install elliptic --save
+****************************************/
+
+const SHA256 = require('crypto-js/sha256') // hash, sha256 = 2**256
 
 
 // Transaction class
@@ -23,7 +30,7 @@ class Block{
     // added "npm install crypto-js" in terminal
 
 
-    calculateHash(){ // calculates hash
+    calculateHash(){ // calculates hash (prev hash + time + data + nonce)
         return SHA256(this.previousHash + this.timeStamp + + JSON.stringify(this.transactions)+this.nonce).toString()
     }
 
@@ -39,7 +46,6 @@ class Block{
 }
 
 
-
 // Blockchain class
 class Blockchain{
     constructor() {
@@ -51,7 +57,7 @@ class Blockchain{
     }
 
     createGenesisBlock(){ // first block
-        return new Block("01/01/2020","Genesis block", 'o') // made up values
+        return new Block(Date(Date.now()).toString(),"Genesis block", 'NONE') // made up values
     }
 
     getLatestBlock(){ // gets latest block
@@ -65,9 +71,10 @@ class Blockchain{
         const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward) // reward for the miner
         this.pendingTransactions.push(rewardTx) // miner reward enters the transactions array
 
-        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash) // ALL pending transactions are entered to block
+        let block = new Block(Date(Date.now()).toString(), this.pendingTransactions, this.getLatestBlock().hash) // ALL pending transactions are entered to block
 
         block.mineBlock(this.difficulty) // mine a new block (similar to old addBlock)
+        
         console.log('Block successfully mined.') // successfully mined blocked msg
 
         this.chain.push(block) // pushes new block into the chain
@@ -77,22 +84,20 @@ class Blockchain{
 
 
     createTransaction(transaction){ // create new transaction
-
         this.pendingTransactions.push(transaction)
     }
 
     
-    getBalanceOfAddress(address){ // gets the balance of certain address (ordinary blockchain wont have this function)
+    getBalanceOfAddress(address){ // gets the balance of certain address (*ordinary blockchain wont have this function*)
         let balance = 0
 
         for(const block of this.chain){ // for each block in chain
             for(const trans of block.transactions){ // for each transaction
 
-                if(trans.fromAddress == address){   // if sender address 
+                if(trans.fromAddress == address){   // sender address 
                     balance -= trans.amount;
                 }
-
-                if(trans.toAddress == address){     // if receiver address
+                if(trans.toAddress == address){     // receiver address
                     balance += trans.amount;
                 }
             }
@@ -116,13 +121,12 @@ class Blockchain{
     } // changing blocks data will lead to a false validation
 
 
-
     // addBlock(newBlock){
     //     newBlock.previousHash = this.getLatestBlock().hash // for current block we need the previous blocks hash
     //     newBlock.mineBlock(this.difficulty) // mine a new block
     //     this.chain.push(newBlock) // insert new block to chain
     // }
 }
-module.exports.Blockchain = Blockchain // for export in different files (?)
+module.exports.Blockchain = Blockchain // export in different files
 module.exports.Block = Block 
 module.exports.Transaction = Transaction

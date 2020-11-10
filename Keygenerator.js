@@ -1,7 +1,7 @@
 /*************************************************
 Generate private key and public key using elliptic
 --------------------------------------------------
-both bitcoin and the ethereum are using secp256k1 
+(both bitcoin and the ethereum are using secp256k1)
 
 A ---> B
 B -/-> A
